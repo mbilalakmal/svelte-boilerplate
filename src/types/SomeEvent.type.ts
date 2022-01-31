@@ -8,3 +8,5 @@ export type SomeEvent = {
 };
 
 export type SomeEventType = "A" | "B" | "C";
+
+export const eventTypes: SomeEventType[] = ["A", "B", "C"];

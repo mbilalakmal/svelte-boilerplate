@@ -1,14 +1,11 @@
 <script lang="ts">
   import EventForm from "./components/EventForm.svelte";
   import SomeEventsList from "./components/SomeEventsList.svelte";
-  import type { SomeEventType } from "./types/SomeEvent.type";
-
-  const eventTypes: SomeEventType[] = ["A", "B", "C"];
 </script>
 
 <main>
-  <EventForm {eventTypes} />
   <SomeEventsList />
+  <EventForm />
 </main>
 
 <style>
