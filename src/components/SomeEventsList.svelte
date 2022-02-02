@@ -9,6 +9,7 @@
     doc,
     deleteDoc,
     QueryConstraint,
+    orderBy,
   } from "firebase/firestore";
   import { collectionData } from "rxfire/firestore";
   import { startWith } from "rxjs/operators";
@@ -22,12 +23,14 @@
   let eventQuery: EventQuery = {};
 
   $: {
-    const constraints: QueryConstraint[] = [];
+    const constraints: QueryConstraint[] = [orderBy("startSeconds")];
+
     if (eventQuery.type) constraints.push(where("type", "==", eventQuery.type));
     if (eventQuery.values && eventQuery.values.length)
       constraints.push(
         where("values", "array-contains-any", eventQuery.values)
       );
+
     eventsRef = query(collectionRef, ...constraints);
   }
 

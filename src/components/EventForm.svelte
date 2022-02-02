@@ -59,6 +59,7 @@
       <label for="startSeconds">Start</label>
       <input
         type="number"
+        step="any"
         id="startSeconds"
         placeholder="0"
         required
@@ -72,6 +73,7 @@
       <label for="EndSeconds">End</label>
       <input
         type="number"
+        step="any"
         id="EndSeconds"
         placeholder="100"
         required
