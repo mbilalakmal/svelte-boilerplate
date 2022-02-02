@@ -30,17 +30,16 @@
     const constraints: QueryConstraint[] = [orderBy("startSeconds")];
 
     if (eventQuery.type) constraints.push(where("type", "==", eventQuery.type));
+
     if (eventQuery.values && eventQuery.values.length)
       constraints.push(
         where("values", "array-contains-any", eventQuery.values)
       );
-    if (eventQuery.spans != undefined) {
-      console.log(eventQuery);
-      constraints.push(
-        where("ranges", "array-contains", eventQuery.range),
-        where("startSeconds", "<=", eventQuery.spans)
-      );
-    }
+    else if (eventQuery.spans != undefined)
+      constraints.push(where("ranges", "array-contains", eventQuery.range));
+
+    if (eventQuery.spans != undefined)
+      constraints.push(where("startSeconds", "<=", eventQuery.spans));
 
     const eventsRef = query(collectionRef, ...constraints);
     events$ = collectionData(eventsRef).pipe(
