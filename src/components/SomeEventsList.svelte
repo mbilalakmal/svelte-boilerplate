@@ -63,6 +63,7 @@
       values: eventQuery.values,
       type: e.detail,
       spans: eventQuery.spans,
+      range: eventQuery.range,
     };
   };
   const updateQueryValues = (e: CustomEvent<number[] | undefined>) => {
@@ -71,6 +72,7 @@
       values: e.detail,
       type: eventQuery.type,
       spans: eventQuery.spans,
+      range: eventQuery.range,
     };
   };
 
