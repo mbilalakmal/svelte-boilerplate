@@ -8,6 +8,7 @@
     SomeEventType,
   } from "../types/SomeEvent.type";
   import EventValues from "./EventValues.svelte";
+  import { convertSpanToRanges } from "../utils/span-ranges-helper";
 
   let startSeconds: number;
   let endSeconds: number;
@@ -38,6 +39,8 @@
   const submit = async () => {
     const newEventRef = doc(collection(database, "events"));
 
+    const ranges = convertSpanToRanges(startSeconds, endSeconds, 100);
+
     const newEvent: SomeEvent = {
       id: newEventRef.id,
       name: name,
@@ -45,6 +48,7 @@
       startSeconds: startSeconds,
       endSeconds: endSeconds,
       values: values,
+      ranges: ranges,
     };
     await setDoc(newEventRef, newEvent);
     reset();

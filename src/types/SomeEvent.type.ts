@@ -5,6 +5,7 @@ export type SomeEvent = {
   startSeconds: number;
   endSeconds: number;
   values: number[];
+  ranges: number[];
 };
 
 export type SomeEventType = "A" | "B" | "C";

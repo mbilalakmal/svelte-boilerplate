@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SomeEvent from "./SomeEvent.svelte";
+  import SomeEventItem from "./SomeEventItem.svelte";
 
   import { database } from "../Firebase";
   import {
@@ -10,17 +10,21 @@
     deleteDoc,
     QueryConstraint,
     orderBy,
+    Query,
   } from "firebase/firestore";
   import { collectionData } from "rxfire/firestore";
-  import { startWith } from "rxjs/operators";
+  import { map, startWith } from "rxjs/operators";
   import EventQueryFilter from "./EventQueryFilter.svelte";
   import type { EventQuery } from "../types/EventQuery.type";
-  import type { SomeEventType } from "../types/SomeEvent.type";
+  import type { SomeEvent, SomeEventType } from "../types/SomeEvent.type";
+  import { convertValueToRange } from "../utils/span-ranges-helper";
+  import type { DocumentData } from "rxfire/firestore/interfaces";
+  import type { Observable } from "rxjs";
 
   const collectionRef = collection(database, "events");
 
-  let eventsRef = query(collectionRef);
   let eventQuery: EventQuery = {};
+  let events$: Observable<SomeEvent[]>;
 
   $: {
     const constraints: QueryConstraint[] = [orderBy("startSeconds")];
@@ -30,19 +34,56 @@
       constraints.push(
         where("values", "array-contains-any", eventQuery.values)
       );
+    if (eventQuery.spans != undefined) {
+      console.log(eventQuery);
+      constraints.push(
+        where("ranges", "array-contains", eventQuery.range),
+        where("startSeconds", "<=", eventQuery.spans)
+      );
+    }
 
-    eventsRef = query(collectionRef, ...constraints);
+    const eventsRef = query(collectionRef, ...constraints);
+    events$ = collectionData(eventsRef).pipe(
+      startWith<DocumentData[]>([]),
+      map<DocumentData[], SomeEvent[]>((x) => {
+        let events = x.map<SomeEvent>((doc: DocumentData) => doc as SomeEvent);
+        console.log(events.length);
+        if (eventQuery.spans != undefined)
+          events = events.filter(
+            (event) => event.endSeconds >= eventQuery.spans
+          );
+        return events;
+      })
+    );
   }
-
-  $: events$ = collectionData(eventsRef).pipe(startWith([]));
 
   const updateQueryType = (e: CustomEvent<SomeEventType | undefined>) => {
     console.log(e.detail);
-    eventQuery = { values: eventQuery.values, type: e.detail };
+    eventQuery = {
+      values: eventQuery.values,
+      type: e.detail,
+      spans: eventQuery.spans,
+    };
   };
   const updateQueryValues = (e: CustomEvent<number[] | undefined>) => {
     console.log(e.detail);
-    eventQuery = { values: e.detail, type: eventQuery.type };
+    eventQuery = {
+      values: e.detail,
+      type: eventQuery.type,
+      spans: eventQuery.spans,
+    };
+  };
+
+  const updateQuerySpan = (e: CustomEvent<number | undefined>) => {
+    console.log(e.detail);
+    const range =
+      e.detail == undefined ? undefined : convertValueToRange(e.detail, 100);
+    eventQuery = {
+      values: eventQuery.values,
+      type: eventQuery.type,
+      spans: e.detail,
+      range: range,
+    };
   };
 
   const remove = async (id: string) => {
@@ -56,10 +97,11 @@
   {eventQuery}
   on:update-type={updateQueryType}
   on:update-values={updateQueryValues}
+  on:update-span={updateQuerySpan}
 />
 <ul>
   {#each $events$ as event}
-    <SomeEvent someEvent={event} on:remove={() => remove(event.id)} />
+    <SomeEventItem someEvent={event} on:remove={() => remove(event.id)} />
   {/each}
 </ul>
 

@@ -4,12 +4,16 @@
 
   import { eventTypes, SomeEventType } from "../types/SomeEvent.type";
   import EventValues from "./EventValues.svelte";
+  import Input from "./Input.svelte";
 
   export let eventQuery: EventQuery;
 
   const dispatch = createEventDispatcher();
 
   const placeholder = "All types";
+
+  const updateSpan = (num: number | undefined) => dispatch("update-span", num);
+
   const updateType = (selection: SomeEventType | undefined) =>
     dispatch("update-type", selection);
 
@@ -31,6 +35,9 @@
   /// Svelte hacks
   $: selection = eventQuery.type;
   $: updateType(selection);
+
+  $: spans = eventQuery.spans;
+  $: updateSpan(spans == undefined ? undefined : spans);
 </script>
 
 <label for="selectedType">EventType</label>
@@ -51,4 +58,8 @@
   on:add-value={addValue}
   on:remove-value={removeValue}
 />
+<br />
+<label for="applySpan">Span</label>
+<Input id="applySpan" on:update={(e) => (eventQuery.spans = e.detail)} />
+
 EventQueryFilter
