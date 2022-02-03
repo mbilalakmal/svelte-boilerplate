@@ -37,7 +37,7 @@
   };
 
   const submit = async () => {
-    const newEventRef = doc(collection(database, "events"));
+    const newEventRef = doc(collection(database, "sessions/session1/events"));
 
     const ranges = convertSpanToRanges(startSeconds, endSeconds, 100);
 

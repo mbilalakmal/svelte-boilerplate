@@ -21,7 +21,7 @@
   import type { DocumentData } from "rxfire/firestore/interfaces";
   import type { Observable } from "rxjs";
 
-  const collectionRef = collection(database, "events");
+  const collectionRef = collection(database, "sessions/session1/events");
 
   let eventQuery: EventQuery = {};
   let events$: Observable<SomeEvent[]>;
@@ -89,7 +89,7 @@
 
   const remove = async (id: string) => {
     console.log("remove");
-    await deleteDoc(doc(database, "events", id));
+    await deleteDoc(doc(database, "sessions/session1/events", id));
   };
 </script>
 
